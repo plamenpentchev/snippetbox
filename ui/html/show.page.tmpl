@@ -1,0 +1,32 @@
+{{template "base" .}}
+
+{{define "title"}}
+    {{if .Snippet}}
+        Snippet # {{ .Snippet.ID }} 
+    {{else}}
+        Snippets
+    {{end}}
+{{end}}
+
+{{define "body"}}
+{{if .Snippet}}
+    {{with .Snippet}}
+        <div class='snippet'>
+            <div class="metadata">
+                <strong>{{.Title}}</strong>
+                <span>#{{.ID}}</span>
+            </div>
+            <pre><code>{{.Content}}</code></pre>
+            <div class='metadata'>
+                <time>Created: {{.Created | humanDate }}</time>
+                <time>{{.Expires | humanDate | printf "Expires on %s" }}</time>
+            </div>
+        </div>
+    {{end}}
+{{else}}
+    <div>
+        <h2>No snippet</h2>
+    </div>
+{{end}}
+{{end}}
+

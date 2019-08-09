@@ -1,0 +1,7 @@
+{{define "sidebar"}}
+
+    <div>
+        <h2>MY SIDEBAR TEMPLATE</h2>
+    </div>
+
+{{end}}
