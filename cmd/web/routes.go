@@ -2,11 +2,15 @@ package main
 
 import (
 	"net/http"
+
+	"github.com/bmizerany/pat"
+	"github.com/justinas/alice"
 )
 
-//Routes ...
+//Routes_1 ...
 //Version 1:  func (app *Application) Routes() *http.ServeMux {
-func (app *Application) Routes() http.Handler {
+func (app *Application) Routes_1() http.Handler {
+
 	mux := http.NewServeMux()
 	// mux.HandleFunc("/snippet/create", env.createSnippet)
 	mux.HandleFunc("/snippet/create", CreateSnippetWithClosure(app))
@@ -23,4 +27,19 @@ func (app *Application) Routes() http.Handler {
 	mux.HandleFunc("/", HomeWithClosure(app))
 
 	return app.RecoverPanic(app.LogRequest(SecureHeaders(mux)))
+}
+
+//Routes ...
+func (app *Application) Routes() http.Handler {
+	mux := pat.New()
+
+	mux.Get("/", HomeWithClosure(app))
+	mux.Get("/snippet/create", CreateSnippetFormWithClosure(app))
+	mux.Post("/snippet/create", CreateSnippetWithClosure(app))
+	mux.Get("/snippet/:id", ShowSnippetWithClosure(app))
+	mux.Get("/static/", http.StripPrefix("/static", http.FileServer(http.Dir("./ui/static"))))
+
+	standardMiddleware := alice.New(app.RecoverPanic, app.LogRequest)
+	return standardMiddleware.Append(SecureHeaders).Then(mux)
+
 }

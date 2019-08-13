@@ -16,10 +16,10 @@ func HomeWithClosure(app *Application) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		app.InfoLogger.Println("HomeWithClosure ...")
 		app.InfoLogger.Printf("Path :'%s'", r.URL.String())
-		if r.URL.String() != "/" {
-			app.NotFound(w)
-			return
-		}
+		// if r.URL.String() != "/" {
+		// 	app.NotFound(w)
+		// 	return
+		// }
 
 		//panic("ooops something bad has happened") //Deliberate panic
 
@@ -39,7 +39,7 @@ func HomeWithClosure(app *Application) http.HandlerFunc {
 func ShowSnippetWithClosure(app *Application) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		app.InfoLogger.Println("ShowSnippetWithClosure ...")
-		id := r.URL.Query().Get("id")
+		id := r.URL.Query().Get(":id")
 		validID, err := strconv.Atoi(id)
 		if err == nil && validID >= 0 {
 			app.InfoLogger.Printf("snippet id [%d]", validID)
@@ -71,11 +71,11 @@ func CreateSnippetWithClosure(app *Application) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		app.InfoLogger.Println("CreateSnippetWitchClosure ...")
 		app.InfoLogger.Printf("Method: %s ", r.Method)
-		if r.Method != "POST" {
-			w.Header().Set("Allow", "POST")
-			app.ClientError(w, http.StatusMethodNotAllowed)
-			return
-		}
+		// if r.Method != "POST" {
+		// 	w.Header().Set("Allow", "POST")
+		// 	app.ClientError(w, http.StatusMethodNotAllowed)
+		// 	return
+		// }
 
 		// title := "Аз съм българче"
 		// content := "Аз съм българче обичам, наште планини зелени\nБългарин да се наричам\nпърва радост е за мене!\n\n- Иван Вазов"
@@ -91,7 +91,14 @@ func CreateSnippetWithClosure(app *Application) http.HandlerFunc {
 			return
 		}
 		app.InfoLogger.Printf("new snippet added [%d]", id)
-		http.Redirect(w, r, fmt.Sprintf("/snippet?id=%d", id), http.StatusSeeOther)
+		http.Redirect(w, r, fmt.Sprintf("/snippet/%d", id), http.StatusSeeOther)
+	}
+}
+
+//CreateSnippetFormWithClosure ...
+func CreateSnippetFormWithClosure(app *Application) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte("Create new snippet"))
 	}
 }
 
