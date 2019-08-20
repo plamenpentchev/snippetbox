@@ -6,26 +6,30 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/golangcollege/sessions"
 	"github.com/plamenpentchev/snippetbox/pkg/models/mysql"
 )
 
 // const servAddr = ":4000"
-var serverAddr *string
+var serverAddr, secret *string
 var dsn *string
 var filePathOnError, logMicrosec *bool
 var infoLog, errorLog *log.Logger
+var session *sessions.Session
 var logFlags int
 var env *Env
 
 func init() {
 	serverAddr = flag.String("addr", ":4000", "HTTP network address")
 
-	dsn = flag.String("dsn", "web:sn1pp3tb0x@tcp(192.168.99.100:3306)/snippetbox?parseTime=True", "mysql connection string")
+	dsn = flag.String("dsn", "web:sn1pp3tb0x@tcp(192.168.99.101:3306)/snippetbox?parseTime=True", "mysql connection string")
 	// dsn = flag.String("dsn", "root:root@tcp(192.168.99.100:3306)/snippetbox", "mysql connection string")
 	filePathOnError = flag.Bool("logFilePathOnError", false, "log full file path on error")
 	logMicrosec = flag.Bool("logMicroSec", false, "log with microseconds")
+	secret = flag.String("secret", "s6Ndh+pPbnzHbS*+9Pk8qGWhTzbpa@ge", "Session Secret Key")
 	flag.Parse()
 
 	logFlags = log.Ldate | log.Ltime
@@ -43,6 +47,8 @@ func init() {
 		InfoLog:  infoLog,
 		ErrorLog: errorLog,
 	}
+	session := sessions.New([]byte(*secret)) // holds configuraton settings for the session
+	session.Lifetime = 12 * time.Hour
 }
 
 func main() {
@@ -50,6 +56,7 @@ func main() {
 	app := &Application{
 		InfoLogger:  infoLog,
 		ErrorLogger: errorLog,
+		Session:     session,
 	}
 
 	app.InfoLogger.Printf("connecting ... [%s]", *dsn)

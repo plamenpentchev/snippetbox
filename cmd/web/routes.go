@@ -31,15 +31,24 @@ func (app *Application) Routes_1() http.Handler {
 
 //Routes ...
 func (app *Application) Routes() http.Handler {
+
+	standardMiddleware := alice.New(app.RecoverPanic, app.LogRequest, SecureHeaders)
+	// standardMiddleware = standardMiddleware.Append(SecureHeaders)
+
+	dynamicMiddleware := alice.New(app.Session.Enable)
+
 	mux := pat.New()
 
 	mux.Get("/", HomeWithClosure(app))
-	mux.Get("/snippet/create", CreateSnippetFormWithClosure(app))
-	mux.Post("/snippet/create", CreateSnippetWithClosure(app))
-	mux.Get("/snippet/:id", ShowSnippetWithClosure(app))
+	mux.Get("/snippet/create", dynamicMiddleware.ThenFunc(CreateSnippetFormWithClosure(app)))
+
+	mux.Post("/snippet/create", dynamicMiddleware.ThenFunc(CreateSnippetWithClosure(app)))
+
+	mux.Get("/snippet/:id", dynamicMiddleware.ThenFunc(ShowSnippetWithClosure(app)))
+
+	// leave the static file without session cookie information(dynamicMiddleware)
 	mux.Get("/static/", http.StripPrefix("/static", http.FileServer(http.Dir("./ui/static"))))
 
-	standardMiddleware := alice.New(app.RecoverPanic, app.LogRequest)
-	return standardMiddleware.Append(SecureHeaders).Then(mux)
+	return standardMiddleware.Then(mux)
 
 }

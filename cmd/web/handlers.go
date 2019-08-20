@@ -8,6 +8,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/plamenpentchev/snippetbox/pkg/forms"
 	"github.com/plamenpentchev/snippetbox/pkg/models"
 )
 
@@ -71,21 +72,67 @@ func CreateSnippetWithClosure(app *Application) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		app.InfoLogger.Println("CreateSnippetWitchClosure ...")
 		app.InfoLogger.Printf("Method: %s ", r.Method)
-		// if r.Method != "POST" {
-		// 	w.Header().Set("Allow", "POST")
-		// 	app.ClientError(w, http.StatusMethodNotAllowed)
+
+		err := r.ParseForm()
+		if err != nil {
+			app.ClientError(w, http.StatusBadRequest)
+			return
+		}
+
+		// title := r.PostForm.Get("title")
+		// content := r.PostForm.Get("content")
+		// expires := r.PostForm.Get("expires")
+
+		//... validation issues
+		// errors := make(map[string]string)
+		// //... for title field
+		// if strings.TrimSpace(title) == "" {
+		// 	errors["title"] = "this field can not be empty"
+		// } else {
+		// 	if utf8.RuneCountInString(title) > 20 {
+		// 		errors["title"] = "the character count in this field must not exceed 20"
+		// 	}
+		// }
+		// //... for content field
+		// if strings.TrimSpace(content) == "" {
+		// 	errors["content"] = "this field can not be empty"
+		// }
+		// //... for expires field
+		// expTmp := strings.TrimSpace(expires)
+		// if expTmp == "" {
+		// 	errors["expires"] = "this field can not be empty"
+		// } else {
+		// 	if expTmp != "365" && expTmp != "7" && expTmp != "1" {
+		// 		errors["expires"] = fmt.Sprintf("inacceptable value in this field found - %s", expTmp)
+		// 	}
+		// }
+		// if len(errors) > 0 {
+		// 	fmt.Fprint(w, errors)
+		// 	return
+		// }
+		// id, err := app.SnippetModel.Insert(title, content, expires)
+		// if err != nil {
+		// 	app.ServerError(w, err)
 		// 	return
 		// }
 
-		// title := "Аз съм българче"
-		// content := "Аз съм българче обичам, наште планини зелени\nБългарин да се наричам\nпърва радост е за мене!\n\n- Иван Вазов"
-		// expires := "7"
+		//... if there were validation errors re-display the create template with the previously submitted values
+		//... and errors
 
-		title := "Отче наш"
-		content := "Отче наш,\nКойто Си на небесата\nда се свети Твоето име, да дойде Твоето царство, да бъде Твоята воля\nкакто на небето, тъй и на земята\n\n- Молитва"
-		expires := "365"
+		form := forms.New(r.PostForm)
+		form.Required("title", "content", "expires")
+		form.MaxLength("title", 100)
+		form.PermittedValues("expires", "365", "7", "1")
 
-		id, err := app.SnippetModel.Insert(title, content, expires)
+		if !form.Valid() {
+			app.render(w, r, "create.page.tmpl", &templateData{
+				Form: form,
+			})
+			return
+		}
+		//... end validation issues
+
+		id, err := app.SnippetModel.Insert(form.Get("title"), form.Get("content"), form.Get("expires"))
 		if err != nil {
 			app.ServerError(w, err)
 			return
@@ -98,7 +145,7 @@ func CreateSnippetWithClosure(app *Application) http.HandlerFunc {
 //CreateSnippetFormWithClosure ...
 func CreateSnippetFormWithClosure(app *Application) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("Create new snippet"))
+		app.render(w, r, "create.page.tmpl", &templateData{Form: &forms.Form{}})
 	}
 }
 
