@@ -38,8 +38,9 @@ func HomeWithClosure(app *Application) http.HandlerFunc {
 
 //ShowSnippetWithClosure ...
 func ShowSnippetWithClosure(app *Application) http.HandlerFunc {
+
+	app.InfoLogger.Println("ShowSnippetWithClosure ...")
 	return func(w http.ResponseWriter, r *http.Request) {
-		app.InfoLogger.Println("ShowSnippetWithClosure ...")
 		id := r.URL.Query().Get(":id")
 		validID, err := strconv.Atoi(id)
 		if err == nil && validID >= 0 {
@@ -55,6 +56,7 @@ func ShowSnippetWithClosure(app *Application) http.HandlerFunc {
 
 			} else {
 				app.render(w, r, "show.page.tmpl", &templateData{
+					Form:        forms.New(r.PostForm),
 					Snippet:     snip,
 					CurrentYear: time.Time.Year(time.Now()),
 				})
