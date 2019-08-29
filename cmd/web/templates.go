@@ -5,12 +5,13 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/plamenpentchev/snippetbox/pkg/models"
 	"github.com/plamenpentchev/snippetbox/pkg/forms"
+	"github.com/plamenpentchev/snippetbox/pkg/models"
 )
 
 type templateData struct {
 	Form        *forms.Form
+	Flash       string
 	Snippet     *models.Snippet
 	Snippets    []*models.Snippet
 	CurrentYear int

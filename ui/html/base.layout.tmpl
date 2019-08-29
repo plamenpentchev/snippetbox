@@ -28,11 +28,12 @@
             {{end}}
         {{end}}
     {{end}}
-
+    {{with .Flash}}
+        <div class="flash">{{.}}</div>
+    {{end}}
     <section>
         {{template "body" .}}
     </section>
-
     {{template "footer" .}}
     <!-- include all javascript scripts -->
     <script src='/static/js/main.js' type='text/javascript'></script>

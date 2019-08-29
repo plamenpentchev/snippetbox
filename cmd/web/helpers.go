@@ -4,7 +4,23 @@ import (
 	"fmt"
 	"net/http"
 	"runtime/debug"
+	"time"
 )
+
+func (app *Application) addDefaultData(td *templateData, r *http.Request) *templateData {
+
+	if nil == td {
+		td = &templateData{}
+	}
+	//... set current year
+	td.CurrentYear = time.Time.Year(time.Now())
+	//... retireve information from the current user session
+	if nil != app.Session && app.Session.Exists(r, "flash") {
+		td.Flash = app.Session.PopString(r, "flash")
+	}
+
+	return td
+}
 
 func (app *Application) render(w http.ResponseWriter, r *http.Request, name string, td *templateData) {
 	ts, ok := app.TemplateCache[name]
@@ -14,7 +30,8 @@ func (app *Application) render(w http.ResponseWriter, r *http.Request, name stri
 	}
 
 	//execute the template set, passing in any data
-	err := ts.Execute(w, td)
+	err := ts.Execute(w, app.addDefaultData(td, r))
+	// err := ts.Execute(w, td)
 	if err != nil {
 		app.ServerError(w, err)
 		return

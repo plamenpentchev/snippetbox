@@ -39,7 +39,7 @@ func (app *Application) Routes() http.Handler {
 
 	mux := pat.New()
 
-	mux.Get("/", HomeWithClosure(app))
+	mux.Get("/", dynamicMiddleware.ThenFunc(HomeWithClosure(app)))
 	mux.Get("/snippet/create", dynamicMiddleware.ThenFunc(CreateSnippetFormWithClosure(app)))
 
 	mux.Post("/snippet/create", dynamicMiddleware.ThenFunc(CreateSnippetWithClosure(app)))

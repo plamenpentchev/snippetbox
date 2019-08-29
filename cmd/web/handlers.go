@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"path/filepath"
 	"strconv"
-	"time"
 
 	"github.com/plamenpentchev/snippetbox/pkg/forms"
 	"github.com/plamenpentchev/snippetbox/pkg/models"
@@ -30,8 +29,7 @@ func HomeWithClosure(app *Application) http.HandlerFunc {
 			return
 		}
 		app.render(w, r, "home.page.tmpl", &templateData{
-			Snippets:    snippets,
-			CurrentYear: time.Time.Year(time.Now()),
+			Snippets: snippets,
 		})
 	}
 }
@@ -55,11 +53,12 @@ func ShowSnippetWithClosure(app *Application) http.HandlerFunc {
 				}
 
 			} else {
+
 				app.render(w, r, "show.page.tmpl", &templateData{
-					Form:        forms.New(r.PostForm),
-					Snippet:     snip,
-					CurrentYear: time.Time.Year(time.Now()),
+					Form:    forms.New(r.PostForm),
+					Snippet: snip,
 				})
+
 			}
 
 		} else {
@@ -140,6 +139,10 @@ func CreateSnippetWithClosure(app *Application) http.HandlerFunc {
 			return
 		}
 		app.InfoLogger.Printf("new snippet added [%d]", id)
+
+		//... adds information to the current user's session data
+		app.Session.Put(r, "flash", fmt.Sprintf("Snippet (%d) successfully created", id))
+
 		http.Redirect(w, r, fmt.Sprintf("/snippet/%d", id), http.StatusSeeOther)
 	}
 }
