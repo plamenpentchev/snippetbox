@@ -25,7 +25,7 @@ var env *Env
 func init() {
 	serverAddr = flag.String("addr", ":4000", "HTTP network address")
 
-	dsn = flag.String("dsn", "web:sn1pp3tb0x@tcp(192.168.99.101:3306)/snippetbox?parseTime=True", "mysql connection string")
+	dsn = flag.String("dsn", "web:sn1pp3tb0x@tcp(192.168.99.100:3306)/snippetbox?parseTime=True", "mysql connection string")
 	// dsn = flag.String("dsn", "root:root@tcp(192.168.99.100:3306)/snippetbox", "mysql connection string")
 	filePathOnError = flag.Bool("logFilePathOnError", false, "log full file path on error")
 	logMicrosec = flag.Bool("logMicroSec", false, "log with microseconds")
