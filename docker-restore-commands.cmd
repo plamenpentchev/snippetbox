@@ -41,4 +41,4 @@ docker run -it --rm -v snippetbox_data:/var/lib/mysql -v /tmp:/Users/plamenpentc
 REM Will restore a volume from a /Users/plamenpentchev/gomodules/volume-export.tgz file.
 REM into a snippetbox_data volume, For this purpose will create temporary container based on the alpine image
 REM and will map this volume to its /var/lib/mysql directory
-docker run -it --rm -v snippetbox_data:/var/lib/mysql -v /tmp:/Users/plamenpentchev/gomodules alpine sh -c "rm -rf /var/lib/mysql/* /varlib/mysql/..?* /varlib/mysql/.[!.]* ; tar -C /varlib/mysql/ -xjf /Benutzer/plamenpentchev/gomodules/volume-export.tgz"
+docker run -it --rm -v snippetbox_data:/var/lib/mysql -v /tmp:/Users/plamenpentchev/gomodules alpine sh -c "rm -rf /var/lib/mysql/* /var/lib/mysql/..?* /var/lib/mysql/.[!.]* ; tar -C /var/lib/mysql/ -xjf /Benutzer/plamenpentchev/gomodules/volume-export.tgz"
